@@ -2,63 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Exception;
+use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        // return blade template
-    }
-
-    /**
-     * Show the form for creating a new resource.
+     * Show the registration form
      */
     public function create()
     {
-        //
+        return view('auth.register');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Handle user registration
      */
     public function store(Request $request)
     {
-        //
-    }
+        // Validate the request data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        try {
+            // Create the user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            // Log in the user after registration
+            Auth::login($user);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            // Redirect to the dashboard with success message
+            return redirect()->intended(route('dashboard'))
+                ->with('success', 'Registration successful! You are now logged in.');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        } catch (Exception $e) {
+            // Log the error for debugging
+            Log::error('Registration failed', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return with error message
+            return back()->withInput()
+                ->with('error', 'Registration failed. Please try again later.');
+        }
     }
 }
+

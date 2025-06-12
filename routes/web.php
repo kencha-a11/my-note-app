@@ -1,31 +1,34 @@
 <?php
 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
-// Guest routes
-Route::redirect('/', '/home'); // Redirects root to /home
-Route::get('/home', function () {
+// Home route
+Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// Authentication routes (for guests)
-Route::middleware(['guest'])->group(function () {
-    // Show login form
-    Route::get('/home/login', [AuthController::class, 'login'])->name('login');
-    // Handle login submission
-    Route::post('/home/login', [AuthController::class, 'loginForm'])->name('login.form'); // Changed URI to be RESTful
 
-    // Show registration form
-    Route::get('/home/register', [AuthController::class, 'register'])->name('register');
-    // Handle registration submission
-    Route::post('/home/register', [AuthController::class, 'registerForm'])->name('register.form'); // Changed URI to be RESTful
+// Guest routes (authentication)
+Route::middleware('guest')->group(function () {
+    // Registration routes
+    Route::get('/register', [UserController::class, 'create'])->name('register');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    // Login routes
+    Route::get('/login', [SessionController::class, 'create'])->name('login');
+    Route::post('/sessions', [SessionController::class, 'store'])->name('sessions.store');
 });
 
 // Authenticated routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-    Route::post('/home/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Logout
+    Route::delete('/sessions', [SessionController::class, 'destroy'])->name('sessions.destroy');
+    // Alternative: if you prefer POST for logout (common for forms)
+    // Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
 });
+

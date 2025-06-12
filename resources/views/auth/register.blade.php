@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('users.store') }}">
         @csrf
         <label for="name">Name</label>
         <input type="text" name="name" id="name" required autofocus>

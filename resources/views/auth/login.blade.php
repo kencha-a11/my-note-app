@@ -8,7 +8,7 @@
     @vite('resources/css/app.css')
 </head>
 <body>
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('sessions.store') }}">
             @csrf
                 <label for="email" >Email</label>
                 <input type="email" name="email" id="email" required autofocus >
