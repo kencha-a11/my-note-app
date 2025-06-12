@@ -33,21 +33,16 @@ class SessionController extends Controller
             // Check if the user exists
             $user = User::where('email', $request->email)->first();
 
-            if (!$user) {
+            if (!$user || !Auth::attempt($request->only('email', 'password'))) {
                 return back()
-                    ->withErrors(['email' => 'This email address is not registered.'])
+                    ->withErrors(['email' => 'These credentials do not match our records.'])
                     ->onlyInput('email');
             }
 
-            // Attempt authentication
-            if (!Auth::attempt($request->only('email', 'password'))) {
-                return back()
-                    ->withErrors(['password' => 'The provided password is incorrect.'])
-                    ->onlyInput('email');
-            }
+            // Log the user in
+            Auth::login($user);
+            Log::info('User logged in', ['email' => $request->email]);
 
-            // Authentication successful
-            $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Login successful! You are now logged in.');
@@ -71,6 +66,7 @@ class SessionController extends Controller
     public function destroy(Request $request)
     {
         // Log out the current authenticated user
+        Log::info('User logged out', ['user_id' => Auth::id()]);
         Auth::logout();
 
         // Invalidate the current session and regenerate CSRF token

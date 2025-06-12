@@ -41,6 +41,7 @@ class UserController extends Controller
 
             // Log in the user after registration
             Auth::login($user);
+            Log::info('User registered and logged in', ['email' => $request->email]);
 
             // Redirect to the dashboard with success message
             return redirect()->intended(route('dashboard'))

@@ -1,7 +1,9 @@
 this is dashboard
 
 {{-- working --}}
-<form action="{{ route('logout') }}" method="POST">
+<form action="{{ route('sessions.destroy') }}" method="POST">
     @csrf
+    @method('DELETE')
     <button type="submit">Logout</button>
 </form>
+<hr>
