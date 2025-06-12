@@ -19,13 +19,12 @@ class NoteFactory extends Factory
     {
         return [
             'title' => fake()->sentence(),
-            'content' => fake()->paragraph(),
-            'message' => fake()->optional()->sentence(),
+            'body' => fake()->paragraph(),
 
             'user_id' => function () {
                 return User::factory()->create()->id;
             },
-            
+
         ];
     }
 }

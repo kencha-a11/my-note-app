@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\DashboardController;
@@ -25,10 +26,11 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     // Logout
     Route::delete('/sessions', [SessionController::class, 'destroy'])->name('sessions.destroy');
-    // Alternative: if you prefer POST for logout (common for forms)
-    // Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
-});
 
+    // notes
+    Route::resource('notes', NoteController::class)
+    ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
+    // how to use the resource controller -> notes.index notes.create notes.store notes.show notes.edit notes.update notes.destroy
+});
