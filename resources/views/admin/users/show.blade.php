@@ -3,7 +3,6 @@ show.blade.php
 <h1>My Profile</h1>
 <br><a href="{{ route('dashboard') }}">Return to dashboard</a><hr>
 
-
 {{-- Success/Error Messages --}}
 @if(session('success'))
     <div>{{ session('success') }}</div>
@@ -39,14 +38,9 @@ show.blade.php
     @endif
 
     {{-- Delete Account (with confirmation) --}}
-    {{-- <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+    <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
         @csrf
         @method('DELETE')
         <button type="submit">Delete Account</button>
-    </form> --}}
-    <form action="{{ route('sessions.destroy')}}" method="POST">
-        @csrf
-        @method('DELETE')
-        <button type="submit">Logout</button>
     </form>
 </div>

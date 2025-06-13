@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SessionController;
@@ -31,10 +32,23 @@ Route::middleware('auth')->group(function () {
 
     // notes
     Route::resource('notes', NoteController::class)
-    ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
-    // how to use the resource controller -> notes.index notes.create notes.store notes.show notes.edit notes.update notes.destroy
+        ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
 
-    Route::resource('user', UserController::class)
-    ->only(['index', 'show', 'edit', 'update']);
-    // ->middleware('can:manage-users');
+    // Exclude 'store' from the resource to avoid conflict with registration
+    Route::resource('users', UserController::class)
+        ->except(['store']); // This prevents POST /users conflict
+
+    Route::get('/profile', [UserController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [UserController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // User management
+    Route::resource('users', AdminController::class);
+
+    // Additional admin actions
+    Route::patch('users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])
+        ->name('users.toggle-admin');
 });
