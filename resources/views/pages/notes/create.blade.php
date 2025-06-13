@@ -1,11 +1,81 @@
-create.blade.php
-<br><a href="{{ route('notes.index') }}">Back to Notes</a><hr>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Note</title>
+    @vite('resources/css/app.css') {{-- Link to your compiled Tailwind CSS --}}
+</head>
+<body class="bg-gray-100 font-sans antialiased">
 
-<form action="{{ route('notes.store') }}" method="POST">
-    @csrf
-    <label for="title">Title</label>
-    <input type="text" name="title" id="title" required>
-    <label for="body">Body</label>
-    <textarea name="body" id="body" required></textarea>
-    <button type="submit">Create Note</button>
-</form>
+    {{-- Header --}}
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="{{ url('/') }}" class="text-2xl font-bold text-gray-800">Your App Name</a>
+            <a href="{{ route('notes.index') }}" class="text-gray-600 hover:text-gray-900">Back to Notes</a>
+        </nav>
+    </header>
+
+    {{-- Main Content --}}
+    <main class="container mx-auto px-6 py-8">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Create New Note</h1>
+
+            {{-- Error Messages --}}
+            @if($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                    <strong class="font-bold">Whoops!</strong>
+                    <span class="block sm:inline">Please fix the following errors:</span>
+                    <ul class="mt-2 list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('notes.store') }}" method="POST">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
+                    <input type="text" name="title" id="title" required
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('title') border-red-500 @enderror"
+                           value="{{ old('title') }}">
+                    @error('title')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
+                    <label for="body" class="block text-gray-700 text-sm font-bold mb-2">Body:</label>
+                    <textarea name="body" id="body" rows="8" required
+                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('body') border-red-500 @enderror">{{ old('body') }}</textarea>
+                    @error('body')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                        Create Note
+                    </button>
+                    <a href="{{ route('notes.index') }}"
+                       class="inline-block align-baseline font-bold text-sm text-gray-500 hover:text-gray-800 transition duration-200">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {{-- Footer --}}
+    <footer class="bg-white shadow-md mt-8">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-600">
+            &copy; {{ date('Y') }} Your App Name. All rights reserved.
+        </div>
+    </footer>
+
+</body>
+</html>
