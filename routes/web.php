@@ -33,4 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('notes', NoteController::class)
     ->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
     // how to use the resource controller -> notes.index notes.create notes.store notes.show notes.edit notes.update notes.destroy
+
+    Route::resource('user', UserController::class)
+    ->only(['index', 'show', 'edit', 'update']);
+    // ->middleware('can:manage-users');
 });

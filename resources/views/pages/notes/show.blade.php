@@ -1,15 +1,12 @@
 show.blade.php
-<div>
-    <h1>{{ $note->title }}</h1>
-    <p>{{ $note->body }}</p>
-</div>
+<br><a href="{{ route('notes.index') }}">Back to Notes</a> <br><hr>
+<p>Title: {{ $note->title }}</p>
+<p>Body: {{ $note->body }}</p>
+<a href="{{ route('notes.edit', $note->id) }}">Edit Note</a>
+<br>
 <form action="{{ route('notes.destroy', $note->id) }}" method="POST" style="display:inline;">
     @csrf
     @method('DELETE')
     <button type="submit">Delete Note</button>
-</form> <br>
-<a href="{{ route('notes.index') }}">Back to Notes</a> <br>
-<a href="{{ route('notes.edit', $note->id) }}">Edit Note</a>
-<br>
-<a href="{{ route('dashboard') }}">Return to Dashboard</a>
-<br>
+</form> <br><hr>
+

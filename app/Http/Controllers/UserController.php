@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
+    public static function middleware(): array
+    {
+        return [
+            'guest' => ['create', 'store'],
+            'auth' => ['index', 'show', 'edit', 'update', 'destroy'],
+        ];
+    }
     /**
      * Show the registration form
      */
@@ -58,6 +65,116 @@ class UserController extends Controller
             return back()->withInput()
                 ->with('error', 'Registration failed. Please try again later.');
         }
+    }
+
+    /**
+     * Display the user profile
+     */
+    public function show(User $user)
+    {
+        // Ensure the authenticated user can only view their own profile
+        if (Auth::user()->id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('pages.users.show', compact('user'));
+    }
+    /**
+     * Show the form for editing the user profile
+     */
+    public function edit(User $user)
+    {
+        // Ensure the authenticated user can only edit their own profile
+        if (Auth::user()->id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('pages.users.edit', compact('user'));
+    }
+    /**
+     * Update the user profile
+     */
+    public function update(Request $request, User $user)
+    {
+        // Ensure the authenticated user can only update their own profile
+        if (Auth::user()->id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Validate the request data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6|confirmed',
+        ]);
+
+        try {
+            // Update the user details
+            $user->name = $request->name;
+            $user->email = $request->email;
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+            Log::info('User profile updated', ['email' => $user->email]);
+
+            return redirect()->route('user.show', Auth::user()->id)
+                ->with('success', 'Profile updated successfully!');
+
+        } catch (Exception $e) {
+            Log::error('Profile update failed', [
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()
+                ->with('error', 'Failed to update profile. Please try again.');
+        }
+    }
+    /**
+     * Delete the user account
+     */
+    public function destroy(User $user)
+    {
+        // Ensure the authenticated user can only delete their own account
+        if (Auth::user()->id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            // Delete the user account
+            $user->delete();
+            Auth::logout();
+
+            Log::info('User account deleted', ['email' => $user->email]);
+
+            return redirect()->route('home')
+                ->with('success', 'Account deleted successfully.');
+
+        } catch (Exception $e) {
+            Log::error('Account deletion failed', [
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to delete account. Please try again.');
+        }
+    }
+    /**
+     * Display a listing of the users
+     */
+    public function index()
+    {
+        // Ensure the user is authenticated and has permission to view the user list
+        if (!Auth::check() || !Auth::user()->can('viewAny', User::class)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $users = User::all(); // Fetch all users
+
+        return view('users.index', compact('users'));
     }
 }
 

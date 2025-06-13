@@ -1,4 +1,6 @@
 create.blade.php
+<br><a href="{{ route('notes.index') }}">Back to Notes</a><hr>
+
 <form action="{{ route('notes.store') }}" method="POST">
     @csrf
     <label for="title">Title</label>
