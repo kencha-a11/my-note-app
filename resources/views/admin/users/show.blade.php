@@ -61,9 +61,9 @@
                 </p>
             </div>
 
-            {{-- Action Buttons --}}
+            {{-- Action Buttons for the authenticated user --}}
             <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <a href="{{ route('profile.edit', $user->id) }}"
+                <a href="{{ route('admin.users.edit', $user->id) }}"
                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full sm:w-auto text-center">
                     Edit Profile
                 </a>
@@ -76,14 +76,23 @@
                     </a>
                 @endif
 
+                {{-- Logout Button --}}
+                {{-- <form action="{{ route('sessions.destroy')}}" method="POST" class="w-full sm:w-auto">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg w-full transition duration-200">
+                        Logout
+                    </button>
+                </form> --}}
+
                 {{-- Delete Account (with confirmation) --}}
-                <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')" class="w-full sm:w-auto">
+                {{-- <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')" class="w-full sm:w-auto">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full">
                         Delete Account
                     </button>
-                </form>
+                </form> --}}
             </div>
         </div>
     </main>

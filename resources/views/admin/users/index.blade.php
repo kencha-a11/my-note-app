@@ -14,7 +14,7 @@
             <a href="{{ url('/') }}" class="text-2xl font-bold text-gray-800">Your App Name</a>
             <div class="flex items-center space-x-4">
                 <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 transition duration-200">Return to Dashboard</a>
-                <a href="{{ route('profile.show') }}" class="text-gray-600 hover:text-gray-900 transition duration-200">Back to My Profile</a>
+                {{-- <a href="{{ route('profile.show') }}" class="text-gray-600 hover:text-gray-900 transition duration-200">Back to My Profile</a> --}}
             </div>
         </nav>
     </header>
@@ -78,12 +78,12 @@
                                     <td class="py-3 px-6 text-left">{{ $user->created_at->format('M d, Y') }}</td>
                                     <td class="py-3 px-6 text-center">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <a href="{{ route('admin.users.show', $user) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">View</a>
-                                            <a href="{{ route('admin.users.edit', $user) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">Edit</a>
+                                            <a href="{{ route('admin.users.show', $user->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">View</a>
+                                            {{-- <a href="{{ route('admin.users.edit', $user->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">Edit</a> --}}
 
                                             @if(auth()->id() !== $user->id)
                                                 {{-- Toggle Admin Status --}}
-                                                <form method="POST" action="{{ route('admin.users.toggle-admin', $user) }}" class="inline-block">
+                                                {{-- <form method="POST" action="{{ route('admin.users.toggle-admin', $user) }}" class="inline-block">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="
@@ -91,16 +91,16 @@
                                                         text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">
                                                         {{ $user->is_admin ? 'Remove Admin' : 'Make Admin' }}
                                                     </button>
-                                                </form>
+                                                </form> --}}
 
                                                 {{-- Delete User --}}
-                                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                                {{-- <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-md text-xs transition duration-200">
                                                         Delete
                                                     </button>
-                                                </form>
+                                                </form> --}}
                                             @else
                                                 <span class="text-gray-400 text-xs italic">(You)</span>
                                             @endif

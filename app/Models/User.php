@@ -45,6 +45,12 @@ class User extends Authenticatable
         'is_admin' => 'boolean', // Add this line for proper boolean casting
     ];
 
+    // Accessor to ensure boolean return
+    public function getIsAdminAttribute($value)
+    {
+        return (bool) $value;
+    }
+
     public function notes()
     {
         return $this->hasMany(Note::class);

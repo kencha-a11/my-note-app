@@ -53,7 +53,7 @@
                     <h3 class="text-xl font-semibold text-gray-700 mb-4">Admin Actions</h3>
                     <ul class="space-y-2">
                         <li><a href="{{ route('admin.users.index') }}" class="text-purple-600 hover:text-purple-800 font-medium">Manage All Users</a></li>
-                        <li><a href="{{ route('admin.users.create') }}" class="text-purple-600 hover:text-purple-800 font-medium">Create New User</a></li>
+                        {{-- <li><a href="{{ route('admin.users.create') }}" class="text-purple-600 hover:text-purple-800 font-medium">Create New User</a></li> --}}
                     </ul>
                 </div>
             @endif

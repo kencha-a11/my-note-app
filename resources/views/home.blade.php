@@ -26,7 +26,7 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-6 py-8">
+    <main class="container mx-auto px-6 py-8 h-193">
         <div class="bg-white p-8 rounded-lg shadow-lg text-center">
             <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Our Application!</h1>
             <p class="text-lg text-gray-600 mb-6">This is your home page. Feel free to explore.</p>

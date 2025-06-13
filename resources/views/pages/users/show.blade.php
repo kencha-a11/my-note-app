@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
+    <title>User Profile - {{ $user->name }}</title>
     @vite('resources/css/app.css') {{-- Link to your compiled Tailwind CSS --}}
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-gray-100 font-sans antialiased min-h-screen flex flex-col">
 
     {{-- Header --}}
     <header class="bg-white shadow-md">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="{{ url('/') }}" class="text-2xl font-bold text-gray-800">Your App Name</a>
-            <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 mx-2">Return to Dashboard</a>
+            <div class="flex items-center space-x-4">
+                @auth
+                    {{-- If logged in as an admin, show link back to admin user list --}}
+                    @if(auth()->user()->is_admin)
+                        <a href="{{ route('admin.users.index') }}" class="text-gray-600 hover:text-gray-900 transition duration-200">Return to User Management</a>
+                    @endif
+                    <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 transition duration-200">Dashboard</a>
+                @endauth
+            </div>
         </nav>
     </header>
 
     {{-- Main Content --}}
-    <main class="container mx-auto px-6 py-8">
+    <main class="container mx-auto px-6 py-8 flex-grow">
         <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">My Profile</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">User Profile: {{ $user->name }}</h1>
 
             {{-- Success/Error Messages --}}
             @if(session('success'))
@@ -38,60 +46,83 @@
 
             {{-- Profile Information --}}
             <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Profile Information</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Profile Information</h2>
 
-                <div class="space-y-3 text-lg text-gray-700">
-                    <p><strong>Name:</strong> <span class="font-medium text-gray-900">{{ $user->name }}</span></p>
-                    <p><strong>Email:</strong> <span class="font-medium text-gray-900">{{ $user->email }}</span></p>
-                    <p><strong>Member Since:</strong> <span class="font-medium text-gray-900">{{ $user->created_at->format('F j, Y') }}</span></p>
+                <p class="mb-3 text-lg text-gray-700">
+                    <strong class="font-medium text-gray-900">Name:</strong> {{ $user->name }}
+                </p>
+                <p class="mb-3 text-lg text-gray-700">
+                    <strong class="font-medium text-gray-900">Email:</strong> {{ $user->email }}
+                </p>
+                <p class="mb-3 text-lg text-gray-700">
+                    <strong class="font-medium text-gray-900">Member Since:</strong> {{ $user->created_at->format('M d, Y') }}
+                </p>
 
-                    {{-- Show admin status if user is admin --}}
-                    <p><strong>Role:</strong>
-                        @if($user->is_admin)
-                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">Administrator</span>
-                        @else
-                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">User</span>
-                        @endif
-                    </p>
-                </div>
+                {{-- Show role status --}}
+                <p class="mb-3 text-lg text-gray-700 flex items-center">
+                    <strong class="font-medium text-gray-900 mr-2">Role:</strong>
+                    @if($user->is_admin)
+                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">Administrator</span>
+                    @else
+                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">Regular User</span>
+                    @endif
+                </p>
             </div>
 
             {{-- Action Buttons --}}
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
-                <a href="{{ route('profile.edit') }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-200">
-                    Edit Profile
-                </a>
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
 
-                {{-- Admin can access admin panel --}}
-                @if(auth()->user()->is_admin)
-                    <a href="{{ route('admin.users.index') }}" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-center transition duration-200">
-                        Admin Panel
-                    </a>
-                @endif
+                {{-- Edit User Button --}}
+                @can('update', $user)
+                    {{-- Check if the current user is an admin viewing another admin's profile, OR
+                         an admin viewing their own profile (in the admin panel context).
+                         If so, guide them to the personal profile edit.
+                         Otherwise, show the general 'Edit User' link (which might lead to admin edit or personal edit based on context)
+                    --}}
+                    @if(auth()->user()->is_admin && auth()->user()->id === $user->id)
+                        {{-- Admin viewing their OWN profile --}}
+                        <a href="{{ route('profile.edit') }}"
+                           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full sm:w-auto text-center">
+                            Edit My Profile
+                        </a>
+                    @else
+                        {{-- Regular user viewing their own profile, OR
+                             Admin viewing a regular user's profile
+                        --}}
+                        <a href="{{ route('admin.users.edit', $user->id) }}"
+                           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full sm:w-auto text-center">
+                            Edit User
+                        </a>
+                    @endif
+                @endcan
 
-                {{-- Logout Button --}}
-                <form action="{{ route('sessions.destroy')}}" method="POST" class="inline-block w-full sm:w-auto">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg w-full transition duration-200">
-                        Logout
-                    </button>
-                </form>
+                {{-- Delete User Button --}}
+                {{-- @can('delete', $user)
+                    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')" class="w-full sm:w-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full">
+                            Delete User
+                        </button>
+                    </form>
+                @endcan --}}
 
-                {{-- Delete Account (uncomment and style if needed) --}}
-                {{-- <form method="POST" action="{{ route('profile.destroy') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')" class="inline-block w-full sm:w-auto">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg w-full transition duration-200">
-                        Delete Account
-                    </button>
-                </form> --}}
+                {{-- Logout Button (always visible if authenticated) --}}
+                @auth
+                    <form action="{{ route('sessions.destroy')}}" method="POST" class="w-full sm:w-auto">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg w-full transition duration-200">
+                            Logout
+                        </button>
+                    </form>
+                @endauth
             </div>
         </div>
     </main>
 
     {{-- Footer --}}
-    <footer class="bg-white shadow-md mt-8">
+    <footer class="bg-white shadow-md mt-auto">
         <div class="container mx-auto px-6 py-4 text-center text-gray-600">
             &copy; {{ date('Y') }} Your App Name. All rights reserved.
         </div>
